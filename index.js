@@ -18,19 +18,19 @@ const mineTransactionHash = async function (account, transaction, mask, length, 
 	if (debug) {
 		process.stdout.clearLine();
 		process.stdout.cursorTo(0);
-		process.stdout.write(`${hash} (${count})`);
+		process.stdout.write(`${hash} (${bits}) (${count})`);
 	}
 
-	// The last bits of the reversed hash should be equal to the last zeroes in the difficulty mask
-	return (bits.endsWith(mask.substr(1))) ? tx : false
+	// The last bits of the reversed hash should be equal to the zeroes in the difficulty mask
+	return (bits.endsWith(mask) || bits == 0) ? tx : false
 }
 
 const createTransaction = async function (difficulty) {
-	const mask = (Math.pow(2, difficulty)).toString(2);
-	const hex = (Math.pow(2, difficulty)).toString(16);
+	const mask = (Math.pow(2, difficulty)).toString(2).substr(1);
+	const hex = (Math.pow(2, difficulty) - 1).toString(16);
 	const length = (hex.length % 2) ? `0${hex}`.length : `${hex}`.length
 
-	console.log(`Mining hash for transaction with difficulty [${difficulty}] mask [${mask}]`);
+	console.log(`Mining hash for transaction with difficulty [${difficulty}] mask [${mask}] hex [${hex}] length [${length}]`);
 
 	const account = new neon.wallet.Account('93f734cc7cd911b7eca6439943cb7a03f34b6c41801ee07355d531ea6c39164a');
 
