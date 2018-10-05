@@ -1,0 +1,14 @@
+{
+  "name": "neo-tx-hash-mining",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodejs index.js"
+  },
+  "author": "Thomas Lobker",
+  "license": "MIT",
+  "dependencies": {
+    "@cityofzion/neon-js": "3.9.1"
+  }
+}
