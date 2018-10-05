@@ -63,6 +63,7 @@ const createTransaction = async function (difficulty) {
 
 const init = async function () {
 	console.time('neo-tx-hash-mining');
+	// Create a transaction and mine for a hash with difficulty level 8
 	await createTransaction(8);
 	console.timeEnd('neo-tx-hash-mining');
 }
