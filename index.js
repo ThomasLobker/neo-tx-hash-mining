@@ -8,7 +8,7 @@ const random = function () {
 	return random;
 }
 
-const mineTransactionHash = async function (account, transaction, mask, length) {
+const mineTransactionHash = async function (account, transaction, mask, length, count) {
 	const tx = new neon.tx.Transaction(transaction).addAttribute(32, '6913a4d3f4e0ffb3aad8e9f919e73b6098f4aa22').addRemark(random()).sign(account.privateKey);
 	const serialized = neon.tx.serializeTransaction(tx);
 	const hash = neon.tx.getTransactionHash(tx);
@@ -18,11 +18,11 @@ const mineTransactionHash = async function (account, transaction, mask, length) 
 	if (debug) {
 		process.stdout.clearLine();
 		process.stdout.cursorTo(0);
-		process.stdout.write(`${hash}`);
+		process.stdout.write(`${hash} (${count})`);
 	}
 
-	// The last bits of the reversed hash should be equal to the difficulty mask
-	return (bits.endsWith(mask)) ? tx : false
+	// The last bits of the reversed hash should be equal to the last zeroes in the difficulty mask
+	return (bits.endsWith(mask.substr(1))) ? tx : false
 }
 
 const createTransaction = async function (difficulty) {
@@ -52,22 +52,19 @@ const createTransaction = async function (difficulty) {
 	let tx = false, count = 0;
 
 	while (!tx) {
-		tx = await mineTransactionHash(account, transaction, mask, length);
+		tx = await mineTransactionHash(account, transaction, mask, length, count);
 		count++;
 	};
 
 	const hash = neon.tx.getTransactionHash(tx);
 
 	console.log();
-	console.log(`Transaction [${hash}] found after [${count}] attempts`);
 }
 
 const init = async function () {
-	for (let i = 1; i < 16; i++) {
-		console.time('Mining transaction hash');
-		await createTransaction(8);
-		console.timeEnd('Mining transaction hash');
-	}
+	console.time('neo-tx-hash-mining');
+	await createTransaction(8);
+	console.timeEnd('neo-tx-hash-mining');
 }
 
 init();
