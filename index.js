@@ -9,7 +9,11 @@ const random = function () {
 }
 
 const mineTransactionHash = async function (account, transaction, mask, length, count) {
-	const tx = new neon.tx.Transaction(transaction).addAttribute(32, '6913a4d3f4e0ffb3aad8e9f919e73b6098f4aa22').addRemark(random()).sign(account.privateKey);
+	// Create a random remark to salt the transaction
+	const remark = random();
+
+	// Create a transaction
+	const tx = new neon.tx.Transaction(transaction).addAttribute(32, '6913a4d3f4e0ffb3aad8e9f919e73b6098f4aa22').addRemark(remark);
 	const serialized = neon.tx.serializeTransaction(tx);
 	const hash = neon.tx.getTransactionHash(tx);
 	const bits = parseInt(neon.u.reverseHex(hash.substr(0, length)), 16).toString(2);
@@ -22,7 +26,7 @@ const mineTransactionHash = async function (account, transaction, mask, length, 
 	}
 
 	// The last bits of the reversed hash should be equal to the zeroes in the difficulty mask
-	return (bits.endsWith(mask) || bits == 0) ? tx : false
+	return (bits.endsWith(mask) || bits == 0) ? tx.sign(account.privateKey) : false
 }
 
 const createTransaction = async function (difficulty) {
@@ -63,8 +67,8 @@ const createTransaction = async function (difficulty) {
 
 const init = async function () {
 	console.time('neo-tx-hash-mining');
-	// Create a transaction and mine for a hash with difficulty level 8
-	await createTransaction(8);
+	// Create a transaction and mine for a hash with difficulty level 16
+	await createTransaction(16);
 	console.timeEnd('neo-tx-hash-mining');
 }
 
